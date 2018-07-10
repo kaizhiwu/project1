@@ -23,4 +23,15 @@ db = scoped_session(sessionmaker(bind=engine))
 
 @app.route("/")
 def index():
-    return "Project 1: TODO"
+    return render_template("index.html")
+
+@app.route("/signup")
+def signup():
+
+    #get form information.
+    username=request.form.get("username")
+
+    #make sure the username is unique.
+    try:
+        if db.execute "SELECT * FROM  WHERE id = :id", {"id": flight_id}).rowcount == 0:
+
