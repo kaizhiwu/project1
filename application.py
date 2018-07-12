@@ -1,6 +1,6 @@
 import os, requests, json
 
-from flask import Flask, session, request, render_template, redirect, url_for, escape
+from flask import Flask, session, request, render_template, redirect, url_for, escape, jsonify
 from flask_session import Session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -23,7 +23,6 @@ Session(app)
 # Set up database
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
-
 
 @app.route('/')
 def index():
@@ -83,13 +82,45 @@ def location():
     location = db.execute("SELECT * FROM zip_codes WHERE zipcode = :zipcode or city = :city",
     {"zipcode": zipcode, "city": city}).fetchone()
 
-    #generate a url for the api call.
+    #generate an url for the api call.
     KEY = 'e613b2582952ed3093a1ce6dde1b1521'
     api_url= "https://api.darksky.net/forecast/" + KEY + '/'+ location.lat + ','+ location.long
     weather = requests.get(api_url).json()
     weather = json.dumps(weather["currently"], indent = 2)
-    return render_template("location.html", location = location, weather = weather)
+
+    #when the user enters the page, get the comment info.
+    if session.get("notes") is None:
+        session["notes"] = []
+    try:
+        note = request.form["note"]
+        session["notes"].append(note)
+    except:
+        session["notes"] = []
+
+    #when the user enters the page, get the check_in info.
+    try:
+        check_in = request.form["check_in"]
+        if check_in == 1 and session["check_in"] == 0:
+            location.check_ins += 1
+            session["check_in"] += 1
+            db.execute("UPDATE zip_codes SET check_ins = :location.check_ins WHERE zipcode = :location.zipcode",
+            {"location.check_ins": location.check_ins, "location.zipcode": location.zipcode})
+            db.commit()
+    except:
+        session["check_in"] = 0
+
+    return render_template("location.html", location = location, weather = weather, notes=session["notes"])
 
 
+@app.route('/api/<string:zipcode>')
+def api(zipcode):
+    location = db.execute("SELECT * FROM zip_codes WHERE zipcode = :zipcode",
+    {"zipcode": zipcode}).fetchone()
 
+    # Make sure location exists.
+    if location is None:
+        return jsonify({"error": "Invalid zipcode"}), 404
+
+    # Get all the info.
+    return render_template('api_call.html', location=location)
 

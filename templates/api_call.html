@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    API of {{location.city}}
+{% endblock %}
+
+{% block body %}
+    <h1>Here is the infomation of {{location.city.capitalize()}}: </h1>
+
+    <div>
+        <ul>
+            <li>"place_name": {{location.city}},</li>
+            <li>"state": {{location.state}},</li>
+            <li>"latitude": {{location.lat}},</li>
+            <li>"longitude": {{location.long}},</li>
+            <li>"zip":{{location.zipcode}},</li>
+            <li>"population": {{location.population}},</li>
+            <li>"check_ins": {{location.check_ins}}</li>
+        </ul>
+    </div>
+{% endblock %}
+

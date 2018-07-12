@@ -1,19 +1,48 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Location Page
+    Location Page of {{location.city }}
 {% endblock %}
 
 {% block body %}
-
+    <h2>Welcome to check info of {{ location.city.capitalize() }}!</h2>
     <ul>
-        <li>name: {{ location.city }}</li>
+        <li>name: {{ location.city.capitalize() }}</li>
         <li>zip code: {{ location.zipcode }}</li>
         <li>latitude: {{ location.lat }}</li>
         <li>longitude: {{ location.long }}</li>
         <li>population: {{ location.population }}</li>
+        <li>check in: {{ location.check_ins }}</li>
     </ul>
 
-    <p>{{weather}}</p>
+    <h3>Here is weather info of {{ location.city.capitalize() }}!</h3>
+    <div>{{weather}}</div>
+
+    <h3>Here are your comment(s) of {{ location.city.capitalize() }}!</h3>
+    <ul>
+        {% for note in notes %}
+            <li>{{ note }}</li>
+        {% endfor %}
+    </ul>
+
+    <h3>Leave your comment(s) of {{ location.city.capitalize() }}!</h3>
+    <form id="comment" action="{{ url_for('location') }}" method="post">
+
+        <div class="form-group">
+            <input type="text" class="form-control" name="note" placeholder="Enter Comment Here">
+        </div>
+
+        <input type="hidden" name="zipcode" value={{location.zipcode}}>
+        <input type="hidden" name="city" value={{location.city}}>
+        <button>Add Comment</button>
+    </form>
+
+    <h3>Check in here.</h3>
+    <form id="check_in" action="{{ url_for('location') }}" method="post">
+        <input type="hidden" name="check_in" value= 1 >
+        <input type="hidden" name="zipcode" value={{location.zipcode}}>
+        <input type="hidden" name="city" value={{location.city}}>
+        <button>check in</button>
+    </form>
 {% endblock %}
 
