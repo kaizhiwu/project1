@@ -1,0 +1,35 @@
+-- Adminer 4.6.3-dev PostgreSQL dump
+
+\connect "d8vtnjt8lnfta6";
+
+DROP TABLE IF EXISTS "userlogins";
+DROP SEQUENCE IF EXISTS userlogins_id_seq;
+CREATE SEQUENCE userlogins_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1;
+
+CREATE TABLE "public"."userlogins" (
+    "id" integer DEFAULT nextval('userlogins_id_seq') NOT NULL,
+    "username" character varying NOT NULL,
+    "psw" character varying NOT NULL,
+    CONSTRAINT "userlogins_pkey" PRIMARY KEY ("id")
+) WITH (oids = false);
+
+
+DROP TABLE IF EXISTS "zip_codes";
+DROP SEQUENCE IF EXISTS zip_codes_id_seq;
+CREATE SEQUENCE zip_codes_id_seq INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1;
+
+CREATE TABLE "public"."zip_codes" (
+    "id" integer DEFAULT nextval('zip_codes_id_seq') NOT NULL,
+    "zipcode" character varying NOT NULL,
+    "city" character varying NOT NULL,
+    "state" character varying NOT NULL,
+    "lat" character varying NOT NULL,
+    "long" character varying NOT NULL,
+    "population" integer NOT NULL,
+    "comments" character varying NOT NULL,
+    "check_ins" integer DEFAULT '0' NOT NULL,
+    CONSTRAINT "zip_codes_pkey" PRIMARY KEY ("id")
+) WITH (oids = false);
+
+
+-- 2018-07-12 21:03:04.757616+00
