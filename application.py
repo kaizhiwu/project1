@@ -1,4 +1,4 @@
-import os
+import os, requests, json
 
 from flask import Flask, session, request, render_template, redirect, url_for, escape
 from flask_session import Session
@@ -6,6 +6,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 
 app = Flask(__name__)
+
+# Set the secret key to some random bytes. Keep this really secret!
+app.secret_key = b'_5#y2L"F4Q8z\ndsaksacjsac\asc]/'
+
 
 # Check for environment variable
 if not os.getenv("DATABASE_URL"):
@@ -27,7 +31,8 @@ def index():
     #if logged in, show the success message.
     if 'username' in session:
         message = "Logged in as %s" % escape(session['username'])
-        return render_template("index.html", message = message)
+        locations = db.execute("SELECT * FROM zip_codes").fetchall()
+        return render_template("index.html", message = message, locations = locations)
     #if not logged in, let the user logged in.
     #return redirect(url_for('signin'))
     return render_template("signin.html")
@@ -42,7 +47,7 @@ def signin():
         session['username'] = request.form['username']
         return redirect(url_for('index'))
     else:
-        return render_template("error.html", message="Wrong password, try again")
+        return render_template("error.html", message="Wrong password or user doesn't exist, try again")
 
 @app.route('/signout')
 def signout():
@@ -62,9 +67,29 @@ def signup():
 
     # Save the data back into the database.
     db.execute("INSERT INTO userlogins (username, psw) VALUES (:x, :y)", {"x": username, "y": psw})
-
+    db.commit()
     # display the success message,and log the user in
     session['username'] = username
     message = "You are registered as %s" % escape(session['username'])
     return render_template("index.html", message = message)
+
+@app.route('/location', methods=['POST'])
+def location():
+    #get the user query information
+    zipcode = request.form['zipcode']
+    city = request.form['city']
+
+    # search the database
+    location = db.execute("SELECT * FROM zip_codes WHERE zipcode = :zipcode or city = :city",
+    {"zipcode": zipcode, "city": city}).fetchone()
+
+    #generate a url for the api call.
+    KEY = 'e613b2582952ed3093a1ce6dde1b1521'
+    api_url= "https://api.darksky.net/forecast/" + KEY + '/'+ location.lat + ','+ location.long
+    weather = requests.get(api_url).json()
+    weather = json.dumps(weather["currently"], indent = 2)
+    return render_template("location.html", location = location, weather = weather)
+
+
+
 

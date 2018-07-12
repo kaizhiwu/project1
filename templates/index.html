@@ -6,5 +6,21 @@
 
 {% block body %}
     <h1>{{message}}</h1>
+    <form action="{{ url_for('location') }}" method="post">
+
+        <div class="form-group">
+            <input class="form-control" name="zipcode" placeholder="type a ZIP code">
+        </div>
+
+        <div class="form-group">
+            <input class="form-control" name="city" placeholder="Enter the name of a city or town">
+        </div>
+
+        <div class="form-group">
+            <button class="btn btn-primary">Search</button>
+        </div>
+
+    </form>
+    <h2><a href="{{url_for('signout')}}">Sign Out</a></h2>
 {% endblock %}
 

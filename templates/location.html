@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Location Page
+{% endblock %}
+
+{% block body %}
+
+    <ul>
+        <li>name: {{ location.city }}</li>
+        <li>zip code: {{ location.zipcode }}</li>
+        <li>latitude: {{ location.lat }}</li>
+        <li>longitude: {{ location.long }}</li>
+        <li>population: {{ location.population }}</li>
+    </ul>
+
+    <p>{{weather}}</p>
+{% endblock %}
+
